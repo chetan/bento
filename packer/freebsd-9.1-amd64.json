@@ -1,9 +1,14 @@
 {
+  "variables": {
+    "chef_version": "provisionerless"
+  },
   "provisioners": [
     {
+      "environment_vars": [ "CHEF_VERSION={{user `chef_version`}}" ],
       "type": "shell",
       "scripts": [
         "scripts/freebsd/postinstall.csh",
+        "scripts/freebsd/cleanup.sh",
         "scripts/common/minimize.sh"
       ],
       "execute_command": "cat '{{.Path}}' | su -"
@@ -41,7 +46,7 @@
       "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
       "virtualbox_version_file": ".vbox_version",
       "vboxmanage": [
-        [ "modifyvm", "{{.Name}}", "--memory", "512" ],
+        [ "modifyvm", "{{.Name}}", "--memory", "768" ],
         [ "modifyvm", "{{.Name}}", "--cpus", "1" ]
       ]
     },
@@ -75,7 +80,7 @@
       "ssh_wait_timeout": "10000s",
       "shutdown_command": "echo 'shutdown -p now' > shutdown.sh; cat 'shutdown.sh' | su -",
       "vmx_data": {
-        "memsize": "512",
+        "memsize": "768",
         "numvcpus": "1",
         "cpuid.coresPerSocket": "1"
       }
@@ -83,7 +88,7 @@
   ],
   "post-processors": [
     {
-      "output": "../builds/{{.Provider}}/opscode_freebsd-9.1_provisionerless.box",
+      "output": "../builds/{{.Provider}}/opscode_freebsd-9.1_chef-{{user `chef_version`}}.box",
       "type": "vagrant"
     }
   ]
